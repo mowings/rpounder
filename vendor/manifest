@@ -1,0 +1,17 @@
+{
+	"version": 0,
+	"dependencies": [
+		{
+			"importpath": "github.com/miekg/dns",
+			"repository": "https://github.com/miekg/dns",
+			"revision": "f282f80e243cc2bf8f6410c30d821b93b794e168",
+			"branch": "master"
+		},
+		{
+			"importpath": "github.com/montanaflynn/stats",
+			"repository": "https://github.com/montanaflynn/stats",
+			"revision": "41c34e4914ec3c05d485e564d9028d8861d5d9ad",
+			"branch": "master"
+		}
+	]
+}

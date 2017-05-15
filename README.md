@@ -1,4 +1,4 @@
-# Rpounder -- stress testing for DNS  resolvers
+# Rpounder: stress testing for DNS  resolvers
 
 Rpounder is essentially apache bench for DNS resolvers. To get help, just run `rpounder --help`
 

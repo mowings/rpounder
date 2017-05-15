@@ -8,8 +8,11 @@ import (
 	"log"
 	"math/rand"
 	"net"
+	"os"
+	"os/signal"
 	"regexp"
 	"strings"
+	"syscall"
 	"time"
 )
 
@@ -26,8 +29,8 @@ func main() {
 	log.Printf("Resolver benchmark starting...")
 	flag.IntVar(&passes, "p", 100, "Number of passes")
 	flag.IntVar(&concurrency, "c", 10, "Concurrent processes")
-	flag.StringVar(&resolver, "r", "localhost:53", "resolver ip")
-	flag.StringVar(&name, "n", "localhost", "Hostname(s) to look up")
+	flag.StringVar(&resolver, "r", "localhost:53", "resolver(s) ip/port. Separate multiple resolvers with spaces or commas")
+	flag.StringVar(&name, "n", "example.com", "Hostname(s) to look up. Separate multiple hostnames with spaces or commas")
 	flag.Parse()
 	passes_per_goproc := passes / concurrency
 	if passes_per_goproc == 0 {
@@ -35,6 +38,15 @@ func main() {
 	}
 	mod := passes % concurrency
 	c := make(chan Msg)
+	q := make(chan struct{})
+
+	sigs := make(chan os.Signal, 1)
+	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
+	go func() {
+		sig := <-sigs
+		log.Printf("=== INTERRUPT: sig = %v", sig)
+		close(q)
+	}()
 
 	for i := 0; i < concurrency; i++ {
 		go func() {
@@ -43,7 +55,7 @@ func main() {
 				num += 1
 				mod--
 			}
-			pound(num, resolver, name, c)
+			pound(num, resolver, name, c, q)
 		}()
 	}
 
@@ -59,42 +71,47 @@ func main() {
 		}
 	}
 	// Print out percentiles
-	for i = 10; i <= 100; i += 10 {
-		rank := float64(i)
-		if rank == 100 {
-			rank = 99.9999999
-		}
-		v, _ := stats.Percentile(times, rank)
-		log.Printf("%dth  => %s", i, time.Duration(v))
+	pctls := []int{50, 60, 70, 80, 90, 99}
+	for _, rank := range pctls {
+		v, _ := stats.Percentile(times, float64(rank))
+		log.Printf("%dth  => %s", rank, time.Duration(v))
 	}
 	min, _ := stats.Min(times)
 	max, _ := stats.Max(times)
 	log.Printf("Fastest: %s  -- Slowest: %s", time.Duration(min), time.Duration(max))
-	log.Printf("Total errors: %d", errs)
+	log.Printf("Total passes: %d. Total errors: %d", len(times), errs)
 }
 
-func pound(passes int, res, hostnames string, c chan Msg) {
+func pound(passes int, res, hostnames string, c chan Msg, q chan struct{}) {
 	sprex := regexp.MustCompile("[\\s\\,]+")
 	lookup_hosts := sprex.Split(hostnames, -1)
-	msg := Msg{make([]float64, passes), 0}
+	msg := Msg{make([]float64, 0, passes), 0}
+	defer func() {
+		c <- msg
+	}()
 	resolvers := sprex.Split(res, -1)
 	resolver := NewResolver(resolvers)
 	var err error
 	hi := 0
 	for i := 0; i < passes; i++ {
-		start := time.Now()
+		select {
+		case <-q:
+			return
+		default:
+		}
 		hostname := lookup_hosts[hi]
 		hi++
 		if hi >= len(lookup_hosts) {
 			hi = 0
 		}
+		start := time.Now()
 		_, err = resolver.LookupHost(hostname)
+		end := float64(time.Since(start))
 		if err != nil {
 			msg.ErrCount++
 		}
-		msg.Times[i] = float64(time.Since(start))
+		msg.Times = append(msg.Times, end)
 	}
-	c <- msg
 }
 
 // DnsResolver represents a dns resolver

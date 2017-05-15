@@ -30,3 +30,14 @@ and other summary informeation:
 	2017/05/15 16:00:44 Fastest: 9.008518ms  -- Slowest: 2.003962086s
 	2017/05/15 16:00:44 Total passes: 1000. Total errors: 4
 
+## Installation
+
+You can grab the latest release under releases, unarchive and just copy the correct binary somewhere on your path. There are no dependencies.
+
+## Building it
+
+You'll need go 1.7 or better. I use [gb](https://getgb.io/) to build, in which case you can simply change to the project directory and run `gb build`. If you prefer to use just go, just change to the project directory and run
+
+    export GOPATH=$GOPATH:`pwd`:`pwd`/vendor
+    
+Once you've done that, you can use `go build` in the usual way to build the executable. 

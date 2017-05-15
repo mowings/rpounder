@@ -32,11 +32,13 @@ and other summary informeation:
 
 ## Installation
 
-You can grab the latest release under releases, unarchive and just copy the correct binary somewhere on your path. There are no dependencies.
+You can grab the latest release from the [release page](https://github.com/mowings/rpounder/releases), unarchive,  and merely copy the correct binary somewhere on your path. There are no dependencies.
 
 ## Building it
 
-You'll need go 1.7 or better. I use [gb](https://getgb.io/) to build, in which case you can simply change to the project directory and run `gb build`. If you prefer to use just go, just change to the project directory and run
+You'll need go 1.7 or better. I use [gb](https://getgb.io/) to build, in which case you can simply change to the project directory and run `gb build`. 
+
+If you prefer to use just go, change to the project directory and run
 
     export GOPATH=$GOPATH:`pwd`:`pwd`/vendor
     

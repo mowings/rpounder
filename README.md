@@ -16,7 +16,7 @@ Rpounder is essentially apache bench for DNS resolvers. To get help, just run `r
 Rpounder will run repeated host look-ups against the specified host(s) and return precentile rankings for request times
 and other summary informeation:
 
-	# rpounder -p 1000 -c 5 -r "198.175.207.1" -n "foo.example.com"
+	# rpounder -p 1000 -c 5 -r "192.168.0.1" -n "foo.example.com"
 
 	2017/05/15 16:00:39 rpounder resolver benchmark 1.0.0 starting
 	2017/05/15 16:00:44 Percentage of the requests served within a certain time:

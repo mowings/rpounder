@@ -14,7 +14,7 @@ Rpounder is essentially apache bench for DNS resolvers. To get help, just run `r
 			resolver(s) ip/port. Separate multiple resolvers with spaces or commas (default "localhost:53")
 
 Rpounder will run repeated host look-ups against the specified host(s) and return precentile rankings for request times
-and other summary informeation:
+and other summary information. Here we're running 5 concurrent processes sending a total of 1000 requests to the resolver at 192.168.0.1 (default port 53) to resolve "foo.example.com". Multiple resolvers or hosts can be separated by spaces and/or commas. Specify an alternate port by appending a colon and a port number to the resolver spec.
 
 	# rpounder -p 1000 -c 5 -r "192.168.0.1" -n "foo.example.com"
 

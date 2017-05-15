@@ -21,12 +21,14 @@ type Msg struct {
 	ErrCount int
 }
 
+const VERSION = "1.0.0"
+
 func main() {
 	var passes int
 	var concurrency int
 	var resolver string
 	var name string
-	log.Printf("Resolver benchmark starting...")
+	log.Printf("rpounder resolver benchmark %s starting", VERSION)
 	flag.IntVar(&passes, "p", 100, "Number of passes")
 	flag.IntVar(&concurrency, "c", 10, "Concurrent processes")
 	flag.StringVar(&resolver, "r", "localhost:53", "resolver(s) ip/port. Separate multiple resolvers with spaces or commas")
@@ -71,7 +73,8 @@ func main() {
 		}
 	}
 	// Print out percentiles
-	pctls := []int{50, 60, 70, 80, 90, 99}
+	log.Printf("Percentage of the requests served within a certain time:")
+	pctls := []int{50, 66, 75, 80, 90, 95, 99}
 	for _, rank := range pctls {
 		v, _ := stats.Percentile(times, float64(rank))
 		log.Printf("%dth  => %s", rank, time.Duration(v))

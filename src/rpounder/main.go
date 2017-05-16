@@ -6,7 +6,6 @@ import (
 	"github.com/miekg/dns"
 	"github.com/montanaflynn/stats"
 	"log"
-	"math/rand"
 	"net"
 	"os"
 	"os/signal"
@@ -117,58 +116,35 @@ func pound(passes int, res, hostnames string, c chan Msg, q chan struct{}) {
 	}
 }
 
-// DnsResolver represents a dns resolver
-// Credit where credit is due -- this code was taken and modified from
-// https://github.com/bogdanovich/dns_resolver:
-//The MIT License (MIT)
-
-//Copyright (c) 2015 Anton Bogdanovich
-
-//Permission is hereby granted, free of charge, to any person obtaining a copy
-//of this software and associated documentation files (the "Software"), to deal
-//in the Software without restriction, including without limitation the rights
-//to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-//copies of the Software, and to permit persons to whom the Software is
-//furnished to do so, subject to the following conditions:
-
-//The above copyright notice and this permission notice shall be included in all
-//copies or substantial portions of the Software.
-
-//THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-//OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-//SOFTWARE.
-
-type DnsResolver struct {
-	Servers []string
-	r       *rand.Rand
+type Resolver struct {
+	servers []string
+	idx     int
 }
 
 // New initializes DnsResolver.
-func NewResolver(servers []string) *DnsResolver {
+func NewResolver(servers []string) *Resolver {
 	for i := range servers {
 		if len(strings.Split(servers[i], ":")) < 2 {
 			servers[i] = net.JoinHostPort(servers[i], "53")
 		}
 	}
-	return &DnsResolver{servers, rand.New(rand.NewSource(time.Now().UnixNano()))}
+	return &Resolver{servers, 0}
 }
 
-// LookupHost returns IP addresses of provied host.
-func (r *DnsResolver) LookupHost(host string) ([]net.IP, error) {
-	return r.lookupHost(host)
-}
-
-func (r *DnsResolver) lookupHost(host string) ([]net.IP, error) {
-	m1 := new(dns.Msg)
-	m1.Id = dns.Id()
-	m1.RecursionDesired = true
-	m1.Question = make([]dns.Question, 1)
-	m1.Question[0] = dns.Question{dns.Fqdn(host), dns.TypeA, dns.ClassINET}
-	in, err := dns.Exchange(m1, r.Servers[r.r.Intn(len(r.Servers))])
+// LookupHost returns A record for host. Round robin if multiple resolvers
+func (r *Resolver) LookupHost(host string) ([]net.IP, error) {
+	defer func() {
+		r.idx++
+	}()
+	if r.idx >= len(r.servers) {
+		r.idx = 0
+	}
+	m := &dns.Msg{}
+	m.Id = dns.Id()
+	m.RecursionDesired = true
+	m.Question = make([]dns.Question, 1)
+	m.Question[0] = dns.Question{dns.Fqdn(host), dns.TypeA, dns.ClassINET}
+	in, err := dns.Exchange(m, r.servers[r.idx])
 
 	result := []net.IP{}
 

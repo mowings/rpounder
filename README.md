@@ -45,3 +45,6 @@ If you prefer to use just go, change to the project directory and run
     export GOPATH=$GOPATH:`pwd`:`pwd`/vendor
     
 Once you've done that, you can use `go build` in the usual way to build the executable. 
+
+For both build methods, set your desired os and architecture via environment variables GOOS and GOARCH to build for your desired platform. 
+The release provides binaries for OSX and Linux, but you can build for any supported Go platform/architecture. 

@@ -77,7 +77,7 @@ func main() {
 	pctls := []int{50, 66, 75, 80, 90, 95, 99}
 	for _, rank := range pctls {
 		v, _ := stats.Percentile(times, float64(rank))
-		log.Printf("%dth  => %s", rank, time.Duration(v))
+		log.Printf("%d%%  => %s", rank, time.Duration(v))
 	}
 	min, _ := stats.Min(times)
 	max, _ := stats.Max(times)

@@ -118,6 +118,8 @@ func pound(passes int, res, hostnames string, c chan Msg, q chan struct{}) {
 }
 
 // DnsResolver represents a dns resolver
+// Credit where credit is due -- this code was taken and modified from
+// https://github.com/bogdanovich/dns_resolver. See project license.
 type DnsResolver struct {
 	Servers []string
 	r       *rand.Rand

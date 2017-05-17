@@ -36,13 +36,13 @@ Multiple resolvers or hosts can be separated by spaces and/or commas. Specify an
 
 You can grab the latest release from the [release page](https://github.com/mowings/rpounder/releases), unarchive,  and merely copy the correct binary somewhere on your path. There are no dependencies.
 
-or 
-
-you can run :
+If you already have go installed you can run:
 
 ```shell
 go get github.com/mowings/rpounder/src/rpounder
 ```
+per usual.
+
 
 ## Building it
 

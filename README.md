@@ -41,7 +41,7 @@ Alternatively, if you already have go installed you can run:
 ```shell
 go get github.com/mowings/rpounder/src/rpounder
 ```
-per usual, which will buils and drop the binaries in your go bin directory.
+per usual, which will build and drop the binaries in your go bin directory.
 
 
 ## Building it

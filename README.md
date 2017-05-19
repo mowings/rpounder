@@ -36,6 +36,14 @@ Multiple resolvers or hosts can be separated by spaces and/or commas. Specify an
 
 You can grab the latest release from the [release page](https://github.com/mowings/rpounder/releases), unarchive,  and merely copy the correct binary somewhere on your path. There are no dependencies.
 
+Alternatively, if you already have go installed you can run:
+
+```shell
+go get github.com/mowings/rpounder/src/rpounder
+```
+per usual, which will buils and drop the binaries in your go bin directory.
+
+
 ## Building it
 
 You'll need go 1.7 or better. I use [gb](https://getgb.io/) to build, in which case you can simply change to the project directory and run `gb build`. 
